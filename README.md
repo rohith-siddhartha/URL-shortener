@@ -1,73 +1,40 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+Url Shortener - WATO assignment
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+I've deployed the service @ https://wato-assignment.onrender.com
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Approach Explaination
 
-## Description
+  User Authentication and Authorization
+  -> I've used username & password for authentication and jwt for authorization and handled resource permissions in the service layer for now
+  
+  Data Model
+  -> I've used a PostgresSQL database to keep the data consistent and based on the data that I am fetching across all the API's, there wasn't much need for Table JOINS. So with these two fatcors I've choosen to stick to a relational DB instead of NoSQL. But I have not explored the analytics part of the project. That might affect my descision if get deeper into that. But for this assignment I've used PostgresSQL
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+  -> I've modelled three entities
+    USER (username (primary key), password, urls (one to many))
+    URL (id, fullUrl, shortUrl, expiresOn, clicks, user)
+    CLICK (id, referralSource, browser, device, timestamp, url)
+    
+    So I am storing click along with these properties for analytis.
 
-## Installation
+  URL shortening logic
+  -> I am generating a randomKey and mapping it to the fullUrl.
+  -> For each server instance, I'll use a unique key (server_id)
+  -> Now for every request I am generating the key as (server_id + current_timestamp);
+  -> Having the server_id will let me easily scale the system horizontally. This will make sure that at any given time no two server generate the same random key for a url.
+  -> Collisions with in a server might occur very rarely (since the timestamp varies in milliseconds) and even in the case of collision I have a unique constraint on shortUrl which will make sure that request fails
 
-```bash
-$ npm install
-```
+  Caching
+  -> I've used redis to cache the fullurl and also other responses wherever possible and the project has a lot of scope of improvement in caching which I can do but I've igonred it for now
 
-## Running the app
+  Deleting the URLs
+  -> I've written a cron job that runs everyday at 00:00:00 AM to delete al the expired urls
 
-```bash
-# development
-$ npm run start
+  Analytics
+  -> I haven't gone deep into this part as I felt that requirements for this part were not clear
 
-# watch mode
-$ npm run start:dev
+  Database
+  -> For the requirements given I felt that NoSQL would be good enough to scale the system. One more reason is that since we are deleting urls frequently I felt that storgae would suffice and a need for partitioning wouldn't arise so I haven't choosen NoSQL for now. But with more requirements I can think more on this part
 
-# production mode
-$ npm run start:prod
-```
+  So this is about my solution. Thanks for the opportunity
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).

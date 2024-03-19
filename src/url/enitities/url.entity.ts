@@ -10,7 +10,7 @@ export class Url {
   @Column({nullable:false})
   fullUrl: string;
 
-  @Column({nullable:false})
+  @Column({nullable:false, unique: true})
   shortUrl: string;
 
   @Column({nullable:false})
