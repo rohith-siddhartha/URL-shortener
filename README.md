@@ -14,8 +14,7 @@ Approach Explaination
     USER (username (primary key), password, urls (one to many))
     URL (id, fullUrl, shortUrl, expiresOn, clicks, user)
     CLICK (id, referralSource, browser, device, timestamp, url)
-    
-    So I am storing click along with these properties for analytis.
+    I am storing click along with these properties for analytis.
 
   URL shortening logic
   -> I am generating a randomKey and mapping it to the fullUrl.
@@ -36,5 +35,100 @@ Approach Explaination
   Database
   -> For the requirements given I felt that NoSQL would be good enough to scale the system. One more reason is that since we are deleting urls frequently I felt that storgae would suffice and a need for partitioning wouldn't arise so I haven't choosen NoSQL for now. But with more requirements I can think more on this part
 
-  So this is about my solution. Thanks for the opportunity
 
+
+ ---- CURLs for the API's ----
+
+  API documentation
+
+
+''' CREATE AN ACCOUNT (This will also logs in the created user)
+
+  endpoint - (POST) 'https://wato-assignment.onrender.com/user'
+  sample payload - 
+  {
+    "username":"rohi",
+    "password":"rohi"
+  }
+
+'''
+
+''' LOG IN
+
+  endpoint - (POST) 'https://wato-assignment.onrender.com/user/login'
+  sample payload - 
+  {
+    "username":"rohi",
+    "password":"rohi"
+  }
+
+'''
+
+''' CREATE URL
+
+  endpoint - (POST) 'https://wato-assignment.onrender.com/url'
+  cookie - token (jwt will be put into cookies once you login)
+  sample payload - 
+  {
+    "fullUrl": "https://www.javatpoint.com",
+    "expiresAt": "2024-03-18T16:56:33.150Z"
+  }
+
+  sample response - 
+  {
+    "fullUrl": "https://www.javatpoint.com",
+    "shortUrl": "A1710864816920", (use this short url to access the fullurl)
+    "expiresOn": "2024-03-18T16:56:33.150Z",
+    "user": {
+        "username": "rohi"
+    },
+    "clicks": [],
+    "id": 12
+  }
+
+'''
+
+''' GET ALL URLS
+
+  endpoint - (GET) 'https://wato-assignment.onrender.com/url/all'
+  cookie - token (jwt will be put into cookies once you login)
+
+  sample response - 
+  [
+  {
+    "id": 12,
+    "fullUrl": "https://www.javatpoint.com",
+    "shortUrl": "A1710864816920",
+    "expiresOn": "2024-03-18T16:56:33.150Z"
+  }
+  ]
+
+'''
+
+''' GET ALL CLICKS
+
+  endpoint - (GET) 'https://wato-assignment.onrender.com/{shortUrl}/clicks'
+  cookie - token (jwt will be put into cookies once you login)
+
+  sample response - 
+  [
+  {
+    "id": 29,
+    "timestamp": "2024-03-19T16:13:59.212Z",
+    "referralSource": null,
+    "browser": "Chrome 122.0.0.0",
+    "deviceType": "Desktop"
+  }
+  ]
+
+'''
+
+''' SHORT URL - visit the short url to get redirected to full url
+
+  endpoint - (GET) 'https://wato-assignment.onrender.com/{shortUrl}'
+
+  will be redirected to the full url
+
+'''
+
+So this is all about my solution. I've learnt a lot doing this assignment and thanks a lot for the job opportunity. I've gone through your website and really liked the idea and would love to work with you guys
