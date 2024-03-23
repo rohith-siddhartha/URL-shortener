@@ -23,7 +23,7 @@ import * as redisStore from 'cache-manager-redis-store';
     UrlModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: `postgres://admin:kwJoHECMvx1IxoYc1Vw8l2y72pBbtH4Z@dpg-cnrv380l5elc73b3a9vg-a.singapore-postgres.render.com/wato`,
+      url: process.env.DB_URL,
       entities: [User, Url, Click],
       synchronize: true,
       ssl: {
